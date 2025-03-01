@@ -9,7 +9,86 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
+    <style>
+        /* Sidebar Styles */
+        #sidebar {
+            position: fixed;
+            top: 62px;
+            left: -400px;
+            width: 400px;
+            height: calc(100vh - 62px);
+            background: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            transition: left 0.3s ease-in-out;
+            z-index: 1000;
+        }
+        #sidebar.open {
+            left: 0;
+        }
+        #sidebar-content {
+            padding: 20px;
+        }
+        #sidebar img {
+            width: 100%;
+            height: auto;
+        }
+        #sidebar h3 {
+            margin-top: 0;
+        }
+        #sidebar p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        #sidebar ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        #sidebar li {
+            margin-bottom: 5px;
+        }
+        #close-sidebar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
 
+        /* Review Section Styles */
+        #review-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        #reviews-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        #reviews-list .review {
+            background: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #eee;
+        }
+        #review-form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            resize: vertical;
+        }
+        #review-form button {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
 <!-- Loading Screen -->
@@ -22,17 +101,12 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark sticky">
         <div class="container-fluid">
-            <!-- Logo -->
             <a class="navbar-brand" href="#">
                 <img alt="New Logo" height="30" src="images/new-logo.png" width="200">
             </a>
-
-            <!-- Hamburger Menu -->
             <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
-            <!-- Navbar Links -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -55,16 +129,12 @@
                         <a class="nav-link" href="#">შესახებ</a>
                     </li>
                 </ul>
-
-                <!-- Search Bar -->
                 <form class="d-flex search-bar">
                     <input class="form-control me-2" placeholder="ძიება" type="search">
                     <button class="btn" type="submit">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>
-
-                <!-- Social Media Icons -->
                 <div class="social-icons">
                     <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
@@ -77,9 +147,25 @@
 
 <main>
     <div id="map"></div>
-
 </main>
 
+<!-- Sidebar -->
+<div id="sidebar">
+    <button id="close-sidebar" onclick="closeSidebar()">×</button>
+    <div id="sidebar-content">
+        <!-- Marker Content -->
+        <div id="marker-content"></div>
+        <!-- Review Section -->
+        <div id="review-section">
+            <h4>Reviews</h4>
+            <div id="reviews-list"></div>
+            <form id="review-form">
+                <textarea id="review-input" placeholder="Write your review..." required></textarea>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- Gallery Section -->
 <section class="gallery">
@@ -148,9 +234,6 @@
     </div>
 </section>
 
-<!-- Map Section -->
-
-
 <!-- Footer -->
 <footer>
     <div class="container">
@@ -200,23 +283,24 @@
     });
 
     // Define Bakuriani's center with the new coordinates
-    var bakurianiCenter = [41.7507708294199, 43.526857416985465]; // New center coordinates
+    var bakurianiCenter = [41.7507708294199, 43.526857416985465];
 
     // Define tighter bounds around the new center
     var bakurianiBounds = L.latLngBounds(
-        L.latLng(41.740, 43.516), // Southwest corner (adjusted bounds)
-        L.latLng(41.760, 43.536)  // Northeast corner (adjusted bounds)
+        L.latLng(41.740, 43.516),
+        L.latLng(41.760, 43.536)
     );
 
     // Initialize the map with the new settings
     var map = L.map('map', {
-        center: bakurianiCenter, // New center of Bakuriani
-        zoom: 15, // Slightly more zoomed in
-        minZoom: 13, // Prevent zooming out too far
-        maxZoom: 18, // Allow more zooming in
-        maxBounds: bakurianiBounds, // Restrict panning outside the new bounds
-        maxBoundsViscosity: 1.0 // Strictly enforce bounds
+        center: bakurianiCenter,
+        zoom: 15,
+        minZoom: 13,
+        maxZoom: 18,
+        maxBounds: bakurianiBounds,
+        maxBoundsViscosity: 1.0
     });
+
     // Use MapTiler Terrain Style
     L.tileLayer('https://api.maptiler.com/maps/outdoor/{z}/{x}/{y}.png?key=n8MKQcXuHsG2NpYWrIaM', {
         attribution: '© <a href="https://www.maptiler.com/copyright/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -224,65 +308,166 @@
 
     // Function to generate random coordinates within Bakuriani's central area
     function getRandomCoordinateInBakurianiCenter() {
-        var lat = 41.74 + Math.random() * 0.03; // Random latitude within Bakuriani center
-        var lng = 43.49 + Math.random() * 0.02; // Random longitude within Bakuriani center
+        var lat = 41.74 + Math.random() * 0.03;
+        var lng = 43.49 + Math.random() * 0.02;
         return [lat, lng];
     }
 
-    // Add markers with random coordinates in Bakuriani's center and updated content
+    // Sample markers data
     var markers = [
         {
             coords: { lat: 41.746470, lng: 43.538834 },
-            title: "Mysterious Forest Cabin",
-            image: "https://via.placeholder.com/300x150?text=Forest+Cabin",
+            title: "Ski House • სკი ჰაუსი",
+            image: "2023-12-30.jpg",
             content: `
-                    <h3>Mysterious Forest Cabin</h3>
-                    <img src="https://via.placeholder.com/300x150?text=Forest+Cabin" alt="Forest Cabin">
-                    <p>This old cabin in the woods is said to be haunted by the spirit of a lumberjack who disappeared decades ago. Locals claim to hear sawing sounds at night.</p>
-                    <a href="#">Read more...</a>
-                `
+                <h3>სამთო სათხილამურო სკოლა ,,სქი ჰაუსი"</h3>
+                <img src="2023-12-30.jpg" alt="Forest Cabin">
+                <p>მისამართი: PGXQ+48M, Tsakadze street, ბაკურიანი</p>
+                <p>ტელეფონი: 577 71 83 33</p>
+            `,
+            moreInfo: `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <p style="font-size: 16px; font-weight: bold; color: #2c3e50; margin-bottom: 10px;">
+                        დამატებითი ინფორმაცია:
+                    </p>
+                    <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                        <span style="font-weight: bold; color: #e74c3c;">სკი ჰაუსი</span> არის ერთ-ერთი ყველაზე პოპულარული სათხილამურო სკოლა ბაკურიანში. ჩვენ გთავაზობთ:
+                    </p>
+                    <ul style="list-style-type: disc; margin-left: 20px; margin-bottom: 15px;">
+                        <li style="font-size: 14px; margin-bottom: 5px;">პროფესიონალურ მწვრთნელებს</li>
+                        <li style="font-size: 14px; margin-bottom: 5px;">მოდერნიზებულ აღჭურვილობას</li>
+                        <li style="font-size: 14px; margin-bottom: 5px;">უსაფრთხო გარემოს დამწყებთათვის და გამოცდილი სპორტსმენებისთვის</li>
+                    </ul>
+                    <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                        <span style="font-weight: bold; color: #27ae60;">სეზონი:</span> დეკემბერი - მარტი
+                    </p>
+                    <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                        <span style="font-weight: bold; color: #2980b9;">ფასები:</span> 50 ლარი/საათი
+                    </p>
+                    <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                        <span style="font-weight: bold; color: #8e44ad;">დამატებითი შეთავაზებები:</span> ჯგუფური გაკვეთილები, ბავშვთა სათხილამურო კლუბი, საღამოს სრიალი.
+                    </p>
+                </div>
+            `
         },
         {
             coords: { lat: 41.7492, lng: 43.5325 },
             title: "Abandoned Ski Lift",
             image: "https://via.placeholder.com/300x150?text=Ski+Lift",
             content: `
-                    <h3>Abandoned Ski Lift</h3>
-                    <img src="https://via.placeholder.com/300x150?text=Ski+Lift" alt="Ski Lift">
-                    <p>An old ski lift that was abandoned after a tragic accident. Visitors report hearing faint whispers and seeing shadowy figures near the lift.</p>
-                    <a href="#">Read more...</a>
-                `
-        },
-        {
-            coords: getRandomCoordinateInBakurianiCenter(),
-            title: "Hidden Waterfall",
-            image: "https://via.placeholder.com/300x150?text=Hidden+Waterfall",
-            content: `
-                    <h3>Hidden Waterfall</h3>
-                    <img src="https://via.placeholder.com/300x150?text=Hidden+Waterfall" alt="Hidden Waterfall">
-                    <p>This secluded waterfall is surrounded by legends of a hidden treasure. Some say the ghost of a treasure hunter guards the spot.</p>
-                    <a href="#">Read more...</a>
-                `
-        },
-        {
-            coords: getRandomCoordinateInBakurianiCenter(),
-            title: "Old Bakuriani Church",
-            image: "https://via.placeholder.com/300x150?text=Old+Church",
-            content: `
-                    <h3>Old Bakuriani Church</h3>
-                    <img src="https://via.placeholder.com/300x150?text=Old+Church" alt="Old Church">
-                    <p>An ancient church with a mysterious past. Locals believe it is haunted by the spirits of monks who once lived here.</p>
-                    <a href="#">Read more...</a>
-                `
+                <h3>Abandoned Ski Lift</h3>
+                <img src="https://via.placeholder.com/300x150?text=Ski+Lift" alt="Ski Lift">
+                <p>An old ski lift that was abandoned after a tragic accident. Visitors report hearing faint whispers and seeing shadowy figures near the lift.</p>
+            `,
+            moreInfo: `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <p style="font-size: 16px; font-weight: bold; color: #2c3e50; margin-bottom: 10px;">
+                        Additional Information:
+                    </p>
+                    <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                        This ski lift was operational until 1995 when a tragic accident occurred. Since then, it has been abandoned, and locals believe it is haunted by the spirits of those who lost their lives.
+                    </p>
+                </div>
+            `
         }
     ];
 
-    // Add markers with hover and click popups
-    markers.forEach(location => {
-        var marker = L.marker(location.coords)
+    // Sample reviews data (can be replaced with a backend API)
+    let reviews = {};
+
+    // Function to open the sidebar with marker content and reviews
+    function openSidebar(markerContent, markerId) {
+        const sidebar = document.getElementById('sidebar');
+        const markerContentDiv = document.getElementById('marker-content');
+        const reviewsList = document.getElementById('reviews-list');
+
+        // Set marker content
+        markerContentDiv.innerHTML = markerContent;
+
+        // Clear existing reviews
+        reviewsList.innerHTML = '';
+
+        // Display reviews for this marker
+        if (reviews[markerId]) {
+            reviews[markerId].forEach(review => {
+                const reviewElement = document.createElement('div');
+                reviewElement.classList.add('review');
+                reviewElement.textContent = review;
+                reviewsList.appendChild(reviewElement);
+            });
+        }
+
+        // Open the sidebar
+        sidebar.classList.add('open');
+
+        // Handle review submission
+        const reviewForm = document.getElementById('review-form');
+        reviewForm.onsubmit = function (event) {
+            event.preventDefault();
+            const reviewInput = document.getElementById('review-input');
+            const reviewText = reviewInput.value.trim();
+
+            if (reviewText) {
+                // Add review to the list
+                if (!reviews[markerId]) {
+                    reviews[markerId] = [];
+                }
+                reviews[markerId].push(reviewText);
+
+                // Display the new review
+                const reviewElement = document.createElement('div');
+                reviewElement.classList.add('review');
+                reviewElement.textContent = reviewText;
+                reviewsList.appendChild(reviewElement);
+
+                // Clear the input
+                reviewInput.value = '';
+            }
+        };
+    }
+
+    // Function to close the sidebar
+    function closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.remove('open');
+    }
+
+    // Function to create a custom red dot icon with black stroke
+    function createRedDotIcon() {
+        return L.divIcon({
+            className: 'red-dot-icon',
+            iconSize: [20, 20],
+            html: `<div style="width: 20px; height: 20px; background-color: red; border: 2px solid black; border-radius: 50%;"></div>`
+        });
+    }
+
+    // Function to create a custom green dot icon with black stroke
+    function createGreenDotIcon() {
+        return L.divIcon({
+            className: 'green-dot-icon',
+            iconSize: [20, 20],
+            html: `<div style="width: 20px; height: 20px; background-color: green; border: 2px solid black; border-radius: 50%;"></div>`
+        });
+    }
+
+    // Add markers with custom icons and click behavior
+    markers.forEach((location, index) => {
+        var marker = L.marker(location.coords, {
+            icon: createRedDotIcon()
+        })
             .addTo(map)
-            .bindTooltip(location.title, {permanent: false, direction: 'top'}) // Hover tooltip
-            .bindPopup(location.content, {className: 'custom-popup'}); // Click popup
+            .bindTooltip(location.title, { permanent: false, direction: 'top' });
+
+        // Open the sidebar when the marker is clicked
+        marker.on('click', function () {
+            openSidebar(location.content + location.moreInfo, index);
+            marker.setIcon(createGreenDotIcon());
+        });
+
+        // Change the icon back to red when the sidebar is closed
+        marker.on('popupclose', function () {
+            marker.setIcon(createRedDotIcon());
+        });
     });
 
     // Back to Top Button
@@ -296,48 +481,11 @@
     });
 
     backToTopButton.addEventListener('click', function () {
-        window.scrollTo({top: 0, behavior: 'smooth'});
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     // Update copyright year dynamically
     document.getElementById('current-year').textContent = new Date().getFullYear();
-    // Function to create a custom red dot icon with black stroke
-    function createRedDotIcon() {
-        return L.divIcon({
-            className: 'red-dot-icon', // CSS class for styling
-            iconSize: [20, 20], // Size of the icon
-            html: `<div style="width: 20px; height: 20px; background-color: red; border: 2px solid black; border-radius: 50%;"></div>`
-        });
-    }
-
-    // Function to create a custom green dot icon with black stroke
-    function createGreenDotIcon() {
-        return L.divIcon({
-            className: 'green-dot-icon', // CSS class for styling
-            iconSize: [20, 20], // Size of the icon
-            html: `<div style="width: 20px; height: 20px; background-color: green; border: 2px solid black; border-radius: 50%;"></div>`
-        });
-    }
-
-    // Add markers with custom icons and click behavior
-    markers.forEach(location => {
-        var marker = L.marker(location.coords, {
-            icon: createRedDotIcon() // Use the red dot icon initially
-        })
-            .addTo(map)
-            .bindTooltip(location.title, { permanent: false, direction: 'top' }) // Hover tooltip
-            .bindPopup(location.content, { className: 'custom-popup' }); // Click popup
-
-        // Change the icon to green when the marker is clicked
-        marker.on('click', function () {
-            marker.setIcon(createGreenDotIcon());
-        });
-
-        // Change the icon back to red when the popup is closed
-        marker.on('popupclose', function () {
-            marker.setIcon(createRedDotIcon());
-        });
-    });
 </script>
 </body>
 </html>
